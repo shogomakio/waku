@@ -1,0 +1,19 @@
+export const SET_ERROR = "SET_ERROR";
+
+// Action types for VIDEO
+export const ADD_VIDEO = "ADD_VIDEO";
+export const UPDATE_VIDEO = "UPDATE_VIDEO";
+export const DELETE_VIDEO = "DELETE_VIDEO";
+export const LOAD_VIDEOS = "LOAD_VIDEOS";
+export const CAN_LOAD_VIDEO = "CAN_LOAD_VIDEO";
+export const UPDATE_THUMBNAIL = "UPDATE_THUMBNAIL";
+export const UPDATE_SHOW_PLAYER = "UPDATE_SHOW_PLAYER";
+export const SEARCH_VIDEO = "SEARCH_VIDEO";
+export const GET_CATEGORIES = "GET_CATEGORIES";
+export const GET_VIDEO_CATEGORIES = "GET_VIDEO_CATEGORIES";
+export const UPDATE_VIDEO_CATEGORIES = "UPDATE_VIDEO_CATEGORIES";
+export const CLEAR_VIDEOS = "CLEAR_VIDEOS";
+
+export const SET_CODE = "SET_CODE";
+
+export const SET_CATEGORY = "SET_CATEGORY";
