@@ -17,6 +17,7 @@ import ButtonBase from "@material-ui/core/ButtonBase";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
 import * as actionTypes from "../../store/actions";
+import * as api from "../api/actions";
 import VideoDetail from "../Videos/Details";
 import PathParser from "../../Utils/PathParser";
 import { Chip } from "@material-ui/core";
@@ -39,12 +40,28 @@ const styles = {
   icon: {
     color: "rgba(255, 255, 255, 0.54)",
   },
+  categories: {
+    direction: "rtl",
+    marginTop: 0,
+  },
+  chip: {
+    backgroundColor: "#E8E8E8",
+    color: "#ea00d9",
+    width: "auto",
+    marginTop: 0,
+    marginLeft: 5,
+    fontSize: 12,
+    height: 18,
+  },
 };
 
 function MediaCard(props) {
   const video = props.video;
   const [isFavorite, setIsFavorite] = React.useState(video.favorite);
   const [showDetailModal, setShowDetailModal] = React.useState(false);
+  const [categories, setCategories] = React.useState([]);
+
+  const { classes } = props;
 
   const getFavoriteColor = (favorite) => {
     if (favorite) {
@@ -54,7 +71,7 @@ function MediaCard(props) {
   };
 
   const handleOnClickFavorite = (id) => {
-    props.updateFavoriteApi(id);
+    api.updateFavoriteApi(id);
     const newIsFavorite = !isFavorite;
     setIsFavorite(newIsFavorite);
   };
@@ -67,11 +84,17 @@ function MediaCard(props) {
     setShowDetailModal(false);
   };
 
+  React.useEffect(async () => {
+    const video = props.video;
+    const categories = await api.getVideoCategoriesApi(video.id);
+    setCategories(categories);
+  }, []);
+
   return (
     <>
       <Card sx={{ width: "25%" }}>
         <ButtonBase
-          className={props.classes.clickableImage}
+          className={classes.clickableImage}
           onClick={() => props.onClickMediaCard(video)}
         >
           <CardMedia
@@ -92,39 +115,49 @@ function MediaCard(props) {
                 height: 50,
                 width: 50,
                 color: "#fff",
-                // backgroundColor: "#000",
                 backgroundColor: "hsl(210deg 8% 55%)",
                 borderRadius: "50%",
               }}
             />
           </IconButton>
         </ButtonBase>
-        <CardContent className={props.classes.CardContent}>
+        <CardContent className={classes.CardContent}>
           <Typography gutterBottom variant="h6" component="div">
             {video.title}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {video.folder}
           </Typography>
-        </CardContent>
-        <CardActions
-          className={props.classes.cardActions}
-          style={{ textAlign: "end !important" }}
-        >
-          <IconButton aria-label="add to favorites">
-            <FavoriteIcon
-              color={getFavoriteColor(isFavorite)}
-              onClick={() => handleOnClickFavorite(video.id)}
-            />
-          </IconButton>
-          <IconButton
-            aria-label={`info about ${video.title}`}
-            sx={{ color: "rgba(255, 255, 255, 0.54)" }}
-            onClick={() => handleShowDetailModal(video)}
+          <CardActions
+            className={classes.cardActions}
+            style={{ textAlign: "end !important" }}
           >
-            <InfoIcon />
-          </IconButton>
-        </CardActions>
+            <IconButton aria-label="add to favorites">
+              <FavoriteIcon
+                color={getFavoriteColor(isFavorite)}
+                onClick={() => handleOnClickFavorite(video.id)}
+              />
+            </IconButton>
+            <IconButton
+              aria-label={`info about ${video.title}`}
+              sx={{ color: "rgba(255, 255, 255, 0.54)" }}
+              onClick={() => handleShowDetailModal(video)}
+            >
+              <InfoIcon />
+            </IconButton>
+          </CardActions>
+          <div className={classes.categories}>
+            {categories.length > 0 &&
+              categories.map((category) => {
+                return (
+                  <Chip
+                    label={category.category_name}
+                    className={classes.chip}
+                  />
+                );
+              })}
+          </div>
+        </CardContent>
       </Card>
       <Modal
         open={showDetailModal}
@@ -138,11 +171,4 @@ function MediaCard(props) {
   );
 }
 
-const mapDispatchToProps = (dispatch) => ({
-  updateFavoriteApi: (id) => dispatch(actionTypes.updateFavoriteApi(id)),
-});
-
-export default compose(
-  withStyles(styles),
-  connect(null, mapDispatchToProps)
-)(MediaCard);
+export default withStyles(styles)(MediaCard);

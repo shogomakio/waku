@@ -14,8 +14,6 @@ import Fade from "@mui/material/Fade";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
-import chroma from "chroma-js";
-
 import * as actionTypes from "../store/actions";
 import { compose } from "redux";
 

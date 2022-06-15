@@ -6,8 +6,11 @@ import chroma from "chroma-js";
 import { Button, Box, TextField, Typography } from "@material-ui/core";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
+import { IconButton, Modal } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 
 import * as actionTypes from "../../store/actions";
+import Category from "./Category";
 
 const useStyles = {
   box: {
@@ -41,13 +44,24 @@ const useStyles = {
     left: "3%",
     // color: "#c7edef",
   },
-  button: {
+  categoryControl: {
     position: "absolute",
-    width: 150,
-    backgroundColor: "#c7edef",
     right: 0,
     bottom: 0,
+    display: "flex",
+    flexDirection: "column",
+    marginRight: 0,
+    alignItems: "end",
+  },
+  categoryIcon: {
+    fontSize: "initial",
+    transform: "scale(0.8)",
+    left: 15,
+  },
+  button: {
+    backgroundColor: "#c7edef",
     color: "#757575",
+    width: 150,
   },
   buttonThumbnail: {
     position: "absolute",
@@ -82,6 +96,7 @@ class VideoDetail extends React.Component {
       timestamps: "70",
       allCategories: [],
       selectedCategories: null,
+      showCategoryModal: false,
     };
   }
   handleSaveChanges = () => {
@@ -112,8 +127,21 @@ class VideoDetail extends React.Component {
   };
 
   handleSelectChange = (selectedOption) => {
-    console.log("selected options:", selectedOption);
     this.setState({ selectedCategories: selectedOption });
+  };
+
+  handleCloseCategoryModal = async () => {
+    this.setState({ showCategoryModal: false });
+
+    await this.props.getCategoriesApi();
+    const allCategories = this.convertCategoriesForSelect(
+      this.props.allCategories
+    );
+    this.setState({ allCategories });
+  };
+
+  handleShowCategoryModal = () => {
+    this.setState({ showCategoryModal: true });
   };
 
   convertCategoriesForSelect = (categories) => {
@@ -131,7 +159,7 @@ class VideoDetail extends React.Component {
   render() {
     const { video } = this.props;
     const { code, title, filename, part, full_path, year } = this.state.video;
-    const timestamps = this.state.timestamps;
+    const { timestamps, showCategoryModal } = this.state;
     const animatedComponents = makeAnimated();
     return (
       <Box sx={useStyles.box}>
@@ -214,16 +242,29 @@ class VideoDetail extends React.Component {
               })}
             />
           </div>
-          <Button
-            variant="contained"
-            sx={{
-              borderRadius: 50,
-            }}
-            style={useStyles.button}
-            type="submit"
-          >
-            Save changes
-          </Button>
+          <div style={useStyles.categoryControl}>
+            <IconButton
+              color="primary"
+              aria-label="add category"
+              style={useStyles.categoryIcon}
+              onClick={this.handleShowCategoryModal}
+            >
+              <EditIcon />
+              <Typography style={{ marginLeft: 8 }}>
+                Manage categories
+              </Typography>
+            </IconButton>
+            <Button
+              variant="contained"
+              sx={{
+                borderRadius: 50,
+              }}
+              style={useStyles.button}
+              type="submit"
+            >
+              Save changes
+            </Button>
+          </div>
         </form>
         <TextField
           type="text"
@@ -244,6 +285,14 @@ class VideoDetail extends React.Component {
         >
           generate
         </Button>
+        <Modal
+          open={showCategoryModal}
+          onClose={this.handleCloseCategoryModal}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Category />
+        </Modal>
       </Box>
     );
   }

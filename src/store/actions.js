@@ -1,5 +1,6 @@
 import axios from "axios";
 import { batch } from "react-redux";
+import Config from "../Utils/Config";
 import * as actionTypes from "./actionTypes";
 
 export const addVideo = (video) => {
@@ -51,8 +52,11 @@ export const clearVideos = () => {
 };
 
 // axios
-export const getVideosApi = (limit = 50, page = 1) => {
-  return async (dispatch, getState) => {
+export const getVideosApi = (
+  limit = Config.searchDefault.limit,
+  page = Config.searchDefault.page
+) => {
+  return async (dispatch) => {
     try {
       const params = `?limit=${limit}&page=${page}`;
       const url = `http://localhost:3000/video/get/all${params}`;
@@ -186,6 +190,7 @@ export const getCategoriesApi = () => {
         type: actionTypes.GET_CATEGORIES,
         categories: json,
       });
+      return [...json];
     } catch (err) {
       alert(err);
     }
@@ -216,6 +221,32 @@ export const updateVideoCategoriesApi = (id, categories) => {
       //   type: actionTypes.UPDATE_VIDEO_CATEGORIES,
       //   categories: categories,
       // });
+    } catch (err) {
+      alert(err);
+    }
+  };
+};
+
+export const updateCategoryApi = (id, category) => {
+  return async () => {
+    try {
+      const url = `http://localhost:3000/category/update`;
+      const body = { id, category };
+      const res = await axios.put(url, body);
+      return res.data;
+    } catch (err) {
+      alert(err);
+    }
+  };
+};
+
+export const addCategoryApi = (category) => {
+  return async () => {
+    try {
+      const url = `http://localhost:3000/category/create`;
+      const body = { category };
+      const res = await axios.post(url, body);
+      return res.data;
     } catch (err) {
       alert(err);
     }
